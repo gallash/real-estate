@@ -1,10 +1,8 @@
-from configparser import MAX_INTERPOLATION_DEPTH
-from re import S
-from token import TYPE_COMMENT
 from django.db import models
 # Use 'django-address'?
 # use 'django-cities'?
 from django.contrib.auth.models import User
+import datetime
 
 # Problemas em aberto:
 # 1. Adicionar maneira de verificar existência do endereço 
@@ -69,6 +67,8 @@ class Rented(models.Model):
     place = models.OneToOneField(Place, on_delete=models.CASCADE) # Imóvel em questão
     # user_pk
     # place_pk
-    # start_period # datetime obj?
+    # start_period = datetime.date()
+    start_date = models.DateField(default=datetime.date.today())
+    end_date = models.DateField(default= datetime.date.today() + datetime.timedelta(days=365))
     # end_period   # datetime obj? 
     
