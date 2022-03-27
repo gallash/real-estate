@@ -21,48 +21,53 @@ class Place(models.Model):
         ('RS', "Rio Grande do Sul")
     ]
 
-    TYPE_CHOICES = [
-        ('Apto', 'Apartamento'),
-        ('Casa', 'Casa'),
-        ('Kit', 'Kitnet')
-    ]
+    # TYPE_CHOICES = [
+    #     ('Apto', 'Apartamento'),
+    #     ('Casa', 'Casa'),
+    #     ('Kit', 'Kitnet')
+    # ]
 
     state = models.CharField(max_length=2, choices=STATE_CHOICES)
     city = models.CharField(max_length=30)
-
-    # address = models.CharField(max_length=50) # Informação adicional, como N° de apartamento, de casa, andar
-    street = models.CharField(max_length=30)
-    number = models.CharField(max_length=30)
-    zip_code = models.CharField(max_length=30)
-    garage = models.IntegerField()
-    
-    # Casa
-    # Somente os acima
-
-    # Apartamento
-    # Kitnet
-    building_name = models.CharField(max_length=30)
-    floor = models.CharField(max_length=10)
-    bloc = models.CharField(max_length=30)
-    appartment_number = models.CharField(max_length=30)
-    
-
-    
-
     description = models.CharField(max_length=200) # Informação extra, como pontos de referência, quantos
-    type_of_place = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    # type_of_place = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    type_of_place = models.CharField(max_length=10)
     price = models.FloatField()
     # Código do imóvel = pk do objeto
+    
+    # Endereço: N° de apartamento, de casa, andar
+    street = models.CharField(max_length=30, default=None, null=True)
+    number = models.CharField(max_length=30, default=None, null=True)
+    zip_code = models.CharField(max_length=30, default=None, null=True)
+    sala = models.IntegerField(default=None, null=True)
+    cozinha = models.IntegerField(default=None, null=True)
+    banheiro = models.IntegerField(default=None, null=True)
+    quartos = models.IntegerField(default=None, null=True)
+    garage = models.IntegerField(default=None, null=True)
+    
+    # Casa somente os acima
+    # Apartamento e Kitnet recebe os de cima e os seguintes
+
+    building_name = models.CharField(max_length=30, default=None, null=True)
+    appartment_number = models.CharField(max_length=30, default=None, null=True)
+    floor = models.CharField(max_length=10, default=None, null=True)
+    bloc = models.CharField(max_length=30, default=None, null=True)
+    
+
+
+
 
     def validate_type(self):
         types = [ self.TYPE_CHOICES[n][0] for n in range(self.TYPE_CHOICES) ] # Comment 'types' outside the classes
         valid = True if self.type_of_place in types else False
         return valid
 
-    def validate_price(self):
+    # def validate_price(self):
+    def validate_price(price):
         # Válido se positivo e com no máx 2 casa decimais
-        is_positive = True if (self.price >= 0) else False
-        correct_decimals = True if (self.price*100 % 1 == 0) else False 
+        # print()
+        is_positive = True if (float(price) >= 0) else False
+        correct_decimals = True if (float(price)*100 % 1 == 0) else False 
         valid = all([is_positive,correct_decimals])
         return valid
 
@@ -90,6 +95,9 @@ class Rented(models.Model):
     start_date = models.DateField(default=datetime.date.today())
     end_date = models.DateField(default= datetime.date.today() + datetime.timedelta(days=365))
     # end_period   # datetime obj? 
+    
+    # Adicionar comentários do Cliente
+    # Adicionar comentários do Staff
     
 
 # class RentalRequest(models.Model):

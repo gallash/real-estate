@@ -7,25 +7,42 @@ from django.core.validators import RegexValidator
 from .models import Rented, Place
 
 
-class PlaceForm(forms.ModelForm):
-    class Meta:
-        model = Place
-        fields = ['']
+# class PlaceForm(forms.ModelForm):
+#     class Meta:
+#         model = Place
+#         fields = ['state', 'city', 'street', 'number', 'zip_code', 'garage']
 
 class HousePlaceForm(forms.ModelForm): # Expressamente assinalar tipo como Casa
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['price'].required = True
+        # self.fields['type_of_place']
+
     class Meta:
         model = Place
-        fields = ['']
+        # Posso assinalar valores assim? 
+        # model.pk = 
+        # model.type_of_place = 
+
+        fields = ['state', 'city', 'street', 'number', 'zip_code',
+            'sala', 'cozinha', 'banheiro','quartos', 'garage', 
+            'description', 'price']
 
 class AppartmentPlaceForm(forms.ModelForm):
     class Meta:
         model = Place
-        fields = ['']
+        fields = ['state', 'city', 'street', 'number', 'zip_code', 
+            'sala', 'cozinha', 'banheiro','quartos', 'garage', 
+            'building_name', 'floor', 'bloc', 'appartment_number',
+            'description', 'price']
 
 class KitnetPlaceForm(forms.ModelForm): # Studio Appartment
     class Meta:
         model = Place
-        fields = ['']
+        fields = ['state', 'city', 'street', 'number', 'zip_code', 
+            'sala', 'cozinha', 'banheiro','quartos', 'garage', 
+            'building_name', 'floor', 'bloc', 'appartment_number',
+            'description', 'price']
 
 
 class RentedForm(forms.ModelForm):
