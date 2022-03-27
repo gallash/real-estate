@@ -27,9 +27,28 @@ class Place(models.Model):
         ('Kit', 'Kitnet')
     ]
 
-    city = models.CharField(max_length=30)
     state = models.CharField(max_length=2, choices=STATE_CHOICES)
-    address = models.CharField(max_length=50) # Informação adicional, como N° de apartamento, de casa, andar
+    city = models.CharField(max_length=30)
+
+    # address = models.CharField(max_length=50) # Informação adicional, como N° de apartamento, de casa, andar
+    street = models.CharField(max_length=30)
+    number = models.CharField(max_length=30)
+    zip_code = models.CharField(max_length=30)
+    garage = models.IntegerField()
+    
+    # Casa
+    # Somente os acima
+
+    # Apartamento
+    # Kitnet
+    building_name = models.CharField(max_length=30)
+    floor = models.CharField(max_length=10)
+    bloc = models.CharField(max_length=30)
+    appartment_number = models.CharField(max_length=30)
+    
+
+    
+
     description = models.CharField(max_length=200) # Informação extra, como pontos de referência, quantos
     type_of_place = models.CharField(max_length=10, choices=TYPE_CHOICES)
     price = models.FloatField()
@@ -72,3 +91,8 @@ class Rented(models.Model):
     end_date = models.DateField(default= datetime.date.today() + datetime.timedelta(days=365))
     # end_period   # datetime obj? 
     
+
+# class RentalRequest(models.Model):
+# Esta classe é criada quando o usuário realiza uma requisição?
+# Ou simplesmente criar uma variável no Rented, chamada permission_from_staff?
+#     user = User

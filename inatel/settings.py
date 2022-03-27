@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'real_estate.apps.RealEstateConfig',
     'users.apps.UsersConfig',
+    'crispy_forms'
 ]
 
 MIDDLEWARE = [
@@ -125,3 +126,8 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Login views
+LOGIN_REDIRECT_URL = 'user-dashboard'
+LOGIN_URL = 'login' # Este é o 'name', recebido no inatel/urls.py

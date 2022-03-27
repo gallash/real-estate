@@ -1,0 +1,25 @@
+{% extends "real_estate/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<main>
+    <!-- user registration form -->
+    <div>
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset>
+                {{ form|crispy }}
+            </fieldset>
+            <div>
+                <!-- Botão -->
+                <button type="submit">Log in</button>
+            </div>
+        </form>
+        <div>
+            <!-- Já tem conta? -->
+            <p>Precisa de uma conta? <a href="{% url 'user-registration' %}">Sign up</a></p>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

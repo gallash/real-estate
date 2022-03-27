@@ -1,0 +1,12 @@
+{% extends "real_estate/base.html" %}
+{% block content %}
+
+<main>
+    {% if user.first_name %}
+        <h1>Hello {{ user.first_name }}!</h1>
+    {% else %}
+        <h1>Hello {{ user.username }}!</h1>
+    {% endif %}
+</main>
+
+{% endblock %}
