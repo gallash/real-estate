@@ -1,0 +1,104 @@
+{% extends "real_estate/base.html" %}
+{% block content %}
+
+<!-- Mostrar tudo que é necessário 
+    na página de detalhes -->
+<!-- Depois daqui criar a página de buscas, onde
+    aparecem todos os apês. Fazer tbm a sorting -->
+<!-- Por último, página de solicitação de aluguel -->
+<!-- Publicar tudo no GitHub e PythonAnywhere e enviar via email -->
+
+<main>
+    <h2>Dados do imóvel</h2>
+
+    {% if place.type_of_place == "Casa" %}
+        <strong>Casa com </strong>
+
+        <p>Salas: {{place.living_rooms}}</p>
+        <p>Cozinhas: {{place.kitchens}}</p>
+        <p>Banheiros: {{place.bathrooms}}</p>
+        <p>Quartos: {{place.bedrooms}}</p>
+        <p>Garage: {{place.garage}}</p>
+    {% endif %}
+
+
+    {% if place.type_of_place == "Apartamento" %}
+        <strong>Apartamento com</strong>
+        <p>Salas: {{place.living_rooms}}</p>
+        <p>Cozinhas: {{place.kitchens}}</p>
+        <p>Banheiros: {{place.bathrooms}}</p>
+        <p>Quartos: {{place.bedrooms}}</p>
+        <p>Garage: {{place.garage}}</p>
+
+        <strong>{{place.building_name}}</strong>
+        <!-- <p>Andar: {{place.floor}}</p> -->
+        {% if place.floor == 0 %}
+            <p>Térreo</p>
+        {% else %}
+            <p>{{place.floor}}° Andar</p>
+        {% endif %}
+        <p>Bloco {{place.bloc}}</p>
+        <p>Apartamento N° {{place.appartment_number}}</p>
+    {% endif %}
+
+
+    {% if place.type_of_place == "Kitnet" %}
+        <strong>Kitnet com</strong>
+        <p>Salas: {{place.living_rooms}}</p>
+        <p>Cozinhas: {{place.kitchens}}</p>
+        <p>Banheiros: {{place.bathrooms}}</p>
+        <p>Quartos: {{place.bedrooms}}</p>
+        <p>Garage: {{place.garage}}</p>
+
+        <strong>{{place.building_name}}</strong>
+        <!-- <p>Andar: {{place.floor}}</p> -->
+        {% if place.floor == 0 %}
+            <p>Térreo</p>
+        {% else %}
+            <p>{{place.floor}}° Andar</p>
+        {% endif %}
+        <p>Bloco {{place.bloc}}</p>
+        <p>Apartamento N° {{place.appartment_number}}</p>
+    {% endif %}
+
+    <div>
+        <p>O preço do aluguel é R${{ place.price }}</p>
+    </div>
+
+    
+
+    <strong>Localizado em</strong>
+    <p>{{place.city}}, {{place.state}}</p>
+    <p>{{place.street}}, {{place.number}}</p>
+    <p>{{place.zip_code}}</p>
+
+    <p>{{place.description}}</p>
+
+
+    
+    <!-- Button/Link para a página 'rental-request' -->
+    
+    <!-- <div>
+        <form method="POST">
+            {% csrf_token %}
+
+            <div>
+                <button type="submit">Expressar interesse</button>
+            </div>
+        </form>
+    </div> -->
+
+    <div>
+        <h2>Tem interesse?</h2>
+        <p>Clique <a href="{% url 'rental-request' place.pk %}">aqui</a> para expressar interesse</p>
+        <strong>Ou</strong>
+        <p>Envie um email para <strong>rental@realestate.com</strong> (email fictício) contendo</p>
+        <ul>
+            <li>username da conta no nosso site</li>
+            <li>código do imóvel</li>
+        </ul>
+    </div>
+
+</main>
+
+{% endblock %}

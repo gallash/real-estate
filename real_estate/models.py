@@ -39,10 +39,10 @@ class Place(models.Model):
     street = models.CharField(max_length=30, default=None, null=True)
     number = models.CharField(max_length=30, default=None, null=True)
     zip_code = models.CharField(max_length=30, default=None, null=True)
-    sala = models.IntegerField(default=None, null=True)
-    cozinha = models.IntegerField(default=None, null=True)
-    banheiro = models.IntegerField(default=None, null=True)
-    quartos = models.IntegerField(default=None, null=True)
+    living_rooms = models.IntegerField(default=None, null=True)
+    kitchens = models.IntegerField(default=None, null=True)
+    bathrooms = models.IntegerField(default=None, null=True)
+    bedrooms = models.IntegerField(default=None, null=True)
     garage = models.IntegerField(default=None, null=True)
     
     # Casa somente os acima
@@ -54,13 +54,12 @@ class Place(models.Model):
     bloc = models.CharField(max_length=30, default=None, null=True)
     
 
+    
 
-
-
-    def validate_type(self):
-        types = [ self.TYPE_CHOICES[n][0] for n in range(self.TYPE_CHOICES) ] # Comment 'types' outside the classes
-        valid = True if self.type_of_place in types else False
-        return valid
+    # def validate_type(self):
+    #     types = [ self.TYPE_CHOICES[n][0] for n in range(self.TYPE_CHOICES) ] # Comment 'types' outside the classes
+    #     valid = True if self.type_of_place in types else False
+    #     return valid
 
     # def validate_price(self):
     def validate_price(price):
@@ -86,18 +85,17 @@ class Rented(models.Model):
 
 
     # I have to create the rented object like this: rented = Rented(user=user, place=place)
-
+    # Campos que o usuário não tem acesso
     user = models.OneToOneField(User, on_delete=models.CASCADE) # Usuário que está logado no ato do aluguel
     place = models.OneToOneField(Place, on_delete=models.CASCADE) # Imóvel em questão
-    # user_pk
-    # place_pk
-    # start_period = datetime.date()
+    status = models.BooleanField(default=False) # Quando ainda em False, pode aparecer em buscas
+    
+    # Campos que o usuário tem acesso
     start_date = models.DateField(default=datetime.date.today())
     end_date = models.DateField(default= datetime.date.today() + datetime.timedelta(days=365))
-    # end_period   # datetime obj? 
+    user_comment = models.TextField(max_length=200, blank=True, null=True)
+
     
-    # Adicionar comentários do Cliente
-    # Adicionar comentários do Staff
     
 
 # class RentalRequest(models.Model):

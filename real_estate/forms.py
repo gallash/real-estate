@@ -12,6 +12,24 @@ from .models import Rented, Place
 #         model = Place
 #         fields = ['state', 'city', 'street', 'number', 'zip_code', 'garage']
 
+HOUSE_FIELDS = ['state', 'city', 'street', 'number', 'zip_code',
+    'living_rooms', 'kitchens', 'bathrooms','bedrooms', 'garage', 
+    'description', 'price']
+
+APPARTMENT_FIELDS = ['state', 'city', 'street', 'number', 'zip_code', 
+    'living_rooms', 'kitchens', 'bathrooms','bedrooms', 'garage', 
+    'building_name', 'floor', 'bloc', 'appartment_number',
+    'description', 'price']
+
+KITNET_FIELDS = ['state', 'city', 'street', 'number', 'zip_code', 
+    'living_rooms', 'kitchens', 'bathrooms','bedrooms', 'garage', 
+    'building_name', 'floor', 'bloc', 'appartment_number',
+    'description', 'price']
+
+
+    
+
+
 class HousePlaceForm(forms.ModelForm): # Expressamente assinalar tipo como Casa
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -24,25 +42,17 @@ class HousePlaceForm(forms.ModelForm): # Expressamente assinalar tipo como Casa
         # model.pk = 
         # model.type_of_place = 
 
-        fields = ['state', 'city', 'street', 'number', 'zip_code',
-            'sala', 'cozinha', 'banheiro','quartos', 'garage', 
-            'description', 'price']
+        fields = HOUSE_FIELDS
 
 class AppartmentPlaceForm(forms.ModelForm):
     class Meta:
         model = Place
-        fields = ['state', 'city', 'street', 'number', 'zip_code', 
-            'sala', 'cozinha', 'banheiro','quartos', 'garage', 
-            'building_name', 'floor', 'bloc', 'appartment_number',
-            'description', 'price']
+        fields = APPARTMENT_FIELDS
 
 class KitnetPlaceForm(forms.ModelForm): # Studio Appartment
     class Meta:
         model = Place
-        fields = ['state', 'city', 'street', 'number', 'zip_code', 
-            'sala', 'cozinha', 'banheiro','quartos', 'garage', 
-            'building_name', 'floor', 'bloc', 'appartment_number',
-            'description', 'price']
+        fields = KITNET_FIELDS
 
 
 class RentedForm(forms.ModelForm):
@@ -50,7 +60,7 @@ class RentedForm(forms.ModelForm):
     place = Place
     class Meta:
         model = Rented
-        fields = ['start_date', 'end_date']
+        fields = ['start_date', 'end_date', 'user_comment']
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -60,3 +70,6 @@ class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'phone', 'password1', 'password2']
+
+
+# class ExpressionInterestForm(forms.Form):

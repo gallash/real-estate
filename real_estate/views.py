@@ -2,18 +2,48 @@ from django.shortcuts import render, redirect
 from django.http.response import HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import Rented, Place
-from .forms import RentedForm, UserRegistrationForm, HousePlaceForm, AppartmentPlaceForm, KitnetPlaceForm
+from .forms import RentedForm, UserRegistrationForm, HousePlaceForm, AppartmentPlaceForm, KitnetPlaceForm #\
+from . import forms
 from django.contrib import messages
 
+HOUSE_FIELDS = forms.HOUSE_FIELDS[:-2]
+APPARTMENT_FIELDS = forms.APPARTMENT_FIELDS[:-2]
+KITNET_FIELDS = forms.KITNET_FIELDS[:-2]
 
 
 
-def main(request): # Main page, home page "/"
-    print(request.user)
-    print(request.user.is_staff)
-    print(dir(request.user))
+def main(request): # Cuida da paginação
+    # print(request.user)
+    # print(request.user.is_staff)
+    # print(dir(request.user))
+    # print(request.session.values())
+
+    # Mostrar todos os imóveis disponíveis
+       
     return render(request, "real_estate/main.html")
 
+
+def pagination(request, place_id):
+    # Procurar no banco de dados qual o imóvel procurado 
+    # pelo place_id (pk/id do imóvel)
+    
+    rented_pk_list = [ rented.place.pk for rented in Rented.objects.all() ]
+    available_pk_list = [ place.pk for place in Place.objects.all() ]
+
+    if (place_id not in rented_pk_list)and(place_id in available_pk_list): 
+        # Se place_id pertencer a algum imóvel disponível
+        # Não queremos mostrar publicamente onde pessoas moram
+
+        place = Place.objects.get(pk=place_id)
+
+        context = {'place': place} # Informação do imóvel que o usuário clicou
+        return render(request, "real_estate/pagination.html", context=context)
+    elif (request.user.is_staff)and(place_id in available_pk_list):
+        place = Place.objects.get(pk=place_id)
+        context = {'place': place} 
+        return render(request, "real_estate/pagination.html", context=context)
+    else:
+        return render(request, "real_estate/access-denied.html")
 
 
 # ---- Usuário ------------------------------------
@@ -39,29 +69,36 @@ def user_dashboard(request):
 
 # Isto acontece quando o usuário clica em um botão "requisitar aluguel" que fica na página detalhada
 # E se um usuário requisitar vários alugueis
-# E se o usuário quiser desistir da requisição?
+# Adicionar opção do usuário desistir da requisição
+# Assim como a opção do usuário deleter sua conta
 # Página para o Staff aceitar ou recusar a requisição
 # Paginação? Como fazer para mostrar os imóveis
 @login_required
-def rental_request(request):
+def rental_request(request, place_id):
+    rented_pk_list = [ rented.place.pk for rented in Rented.objects.all() ]
+    if place_id in rented_pk_list: # De novo, não podemos requisitar um imóvel alocado
+        return render(request, "real_estate/access-denied.html")
+
     if request.method == 'POST':
         form = RentedForm(request.POST)
-        valid = all(Place.validate_price(form.data.get("price")))
+        # valid = all(Place.validate_price(form.data.get("price")))
 
-        if (form.is_valid() and valid):
-            # form.save()
-            
+        if form.is_valid():
+            start_date = form.cleaned_data.get('start_date')
+            end_date = form.cleaned_data.get('end_date')
+            user_comment = form.cleaned_data.get('user_comment')
+            place = Place.objects.get(pk=place_id)
+            rented = Rented(user=request.user, place=place, start_date=start_date, end_date=end_date, user_comment = user_comment)
+            # rented.save()
             messages.success(request, "Requisição realizada com sucesso. A equipe irá avaliar o pedido.")
         
-            # Dashboard do usuário
-            return render(request, "real_estate/user-dashboard.html")
-        # else 
-        
+            return redirect('../../user')
+       
     else:
         form = RentedForm()
     
     context = {'form': form}
-    return render(request, "real_estate/request-rental.html", context=context)
+    return render(request, "real_estate/rental-request.html", context=context)
 
 
 
@@ -75,18 +112,18 @@ def place_house_registration(request):
         if request.method == 'POST':
             form = HousePlaceForm(request.POST) # PlaceForm
             valid = all([Place.validate_price(form.data.get("price"))])
-            # O imóvel não é único no banco de dados, retornar erro
-            # Confirmei que posso comprar listas assim: 
-            #       form.lista_de_todos_elementos_do_imóvel = lista de todos os elems dos imóveis no DB
-            form_keys = list(form.data.keys)
-            form_keys.pop(0)
-            form_values = [ form.data.get(key) for key in form_keys ]
-
-            for place in Place.objects.all():
-                place.__dict__
-                if elementos todos forem iguais, tipo estado, cidade, CEP, numero, bloco, nome do prédio, etc baterem, não salvar
-                    messages.error("O imóvel já foi cadastrado no banco de dados.")
-                    pass
+            # O imóvel não é único no banco de dados, retornar erro  
+            # Não tive tempo ainda de implementar esta parte do código        
+            # for place in Place.objects.all():
+            #     # equal = False
+            #     for field in HOUSE_FIELDS:
+            #         # Não é a solução mais ótima, mas foi a mais rápida de ser feita
+            #         if form.data.get(field) == place.__getattribute__(field):
+            #             messages.error("O imóvel já foi cadastrado no banco de dados.")
+                # place.__dict__
+                # if elementos todos forem iguais, tipo estado, cidade, CEP, numero, bloco, nome do prédio, etc baterem, não salvar
+                #     messages.error("O imóvel já foi cadastrado no banco de dados.")
+                #     pass
 
             # O imóvel é único
             if (form.is_valid())and(valid):
@@ -94,9 +131,7 @@ def place_house_registration(request):
                 place = Place.objects.last()
                 place.type_of_place = "Casa"
                 place.save()
-                # messages.success("O imóvel foi salvo com sucesso")
-                # return 
-                pass        
+                messages.success("O imóvel foi cadastrado com sucesso")
         else:
             form = HousePlaceForm()
 
@@ -110,20 +145,15 @@ def place_house_registration(request):
 def place_appartment_registration(request):
     if request.user.is_staff:
         if request.method == 'POST':
-            form = AppartmentPlaceForm(request.POST) # PlaceForm
-            valid = all(Place.validate_price(form.data.get("price")))
-            # Abrir o formulário para cadastramento de imóveis
-            # Verificar se as informações são válidas
-            # O imóvel não é único no banco de dados, retornar erro
-            # Confirmei que posso comprar listas assim: 
-            #       form.lista_de_todos_elementos_do_imóvel = lista de todos os elems dos imóveis no DB
+            form = AppartmentPlaceForm(request.POST)
+            valid = all([Place.validate_price(form.data.get("price"))])
 
-            # O imóvel é único
             if (form.is_valid())and(valid):
-                # form.save()
-                # messages.success("O imóvel foi salvo com sucesso")
-                # return 
-                pass        
+                form.save()
+                place = Place.objects.last()
+                place.type_of_place = "Apartamento"
+                place.save()
+                messages.success("O imóvel foi cadastrado com sucesso")
         else:
             form = AppartmentPlaceForm()
 
@@ -137,20 +167,15 @@ def place_appartment_registration(request):
 def place_kitnet_registration(request):
     if request.user.is_staff:
         if request.method == 'POST':
-            form = KitnetPlaceForm(request.POST) # PlaceForm
-            valid = all(Place.validate_price(form.data.get("price")))
-            # Abrir o formulário para cadastramento de imóveis
-            # Verificar se as informações são válidas
-            # O imóvel não é único no banco de dados, retornar erro
-            # Confirmei que posso comprar listas assim: 
-            #       form.lista_de_todos_elementos_do_imóvel = lista de todos os elems dos imóveis no DB
+            form = KitnetPlaceForm(request.POST)
+            valid = all([Place.validate_price(form.data.get("price"))])
 
-            # O imóvel é único
             if (form.is_valid())and(valid):
-                # form.save()
-                # messages.success("O imóvel foi salvo com sucesso")
-                # return 
-                pass        
+                form.save()
+                place = Place.objects.last()
+                place.type_of_place = "Kitnet"
+                place.save()
+                messages.success("O imóvel foi cadastrado com sucesso")
         else:
             form = KitnetPlaceForm()
 
@@ -164,9 +189,10 @@ def place_kitnet_registration(request):
 def staff_dashboard(request):
     if request.user.is_staff:
         # Aqui o membro de staff poderá 
-        # 1. Gerenciar imóveis
+        # 1. Gerenciar imóveis: Mostrar imóveis locados
         # 2. Aceitar ou rejeitar (rented.user_rental_interest) Esta parte é mesmo necessária?
         pass
+
     else:
         return render(request, "real_estate/access-denied.html")
 

@@ -1,0 +1,27 @@
+{% extends "real_estate/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<!-- Depois daqui criar a página de buscas, onde
+    aparecem todos os apês. Fazer tbm a sorting -->
+<!-- Por último, página de solicitação de aluguel -->
+<!-- Publicar tudo no GitHub e PythonAnywhere e enviar via email -->
+
+<main>
+    <h1>Expressão de interesse</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset>
+            {{ form|crispy }}
+        </fieldset>
+        <div>
+            <button type="submit">Submeter</button>
+        </div>
+    </form>
+
+    <div>
+        <p>Após a submissão da expressão de interesse, um membro de staff entrará em contato pelo email ou telefone!</p>
+    </div>
+</main>
+
+{% endblock %}

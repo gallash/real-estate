@@ -1,0 +1,26 @@
+{% extends "real_estate/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<main>
+    <!-- Formulário de registro de Kitnet -->
+    <div>
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset>
+                <!-- Form -->
+                <legend>Registro de Kitnet</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div>
+                <!-- Botão -->
+                <button type="submit">Registrar</button>
+            </div>
+        </form>
+        <div>
+            <!-- Sub Nav Bar: House, Appartment ou Kitnet -->
+        </div>
+    </div>
+</main>
+
+{% endblock %}
