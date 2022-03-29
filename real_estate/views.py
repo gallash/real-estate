@@ -13,26 +13,43 @@ KITNET_FIELDS = forms.KITNET_FIELDS[:-2]
 
 
 def main(request): # Cuida da paginação
-    # print(request.user)
-    # print(request.user.is_staff)
-    # print(dir(request.user))
-    # print(request.session.values())
+    # Adicionar imagens, se der
 
-    # Mostrar todos os imóveis disponíveis
-    # Sort por tipo
-    # Se der, fazer separar em páginas
-    rented_pk_list = [ rented.place.pk for rented in Rented.objects.all() ]
+    pk = [] # pk dos Place obj que estão alugados
+    for rented in Rented.objects.all():
+        if rented.status is True:
+            pk.append(rented.place.pk)
+    
     places = []
     for place in Place.objects.all():
-        if place.pk not in rented_pk_list:
+        if place.pk not in pk:
             places.append(place)
 
     context = {'places': places}
     return render(request, "real_estate/main.html", context=context)
 
 
+def main_sorted(request, type_of_place):
+    pk = [] # pk dos Place obj que estão alugados
+    for rented in Rented.objects.all():
+        if rented.status is True:
+            pk.append(rented.place.pk)
+    
+    places = []
+    for place in Place.objects.all():
+        if place.pk not in pk:
+            places.append(place)
+
+    sorted_places = []
+    for place in places:
+        if place.type_of_place == type_of_place:
+            sorted_places.append(place)
+
+    context = {'places': sorted_places}
+    return render(request, "real_estate/main.html", context=context)
+
+
 def pagination(request, place_id):
-    rented_pk_list = [ rented.place.pk for rented in Rented.objects.all() ]
     available_pk_list = [ place.pk for place in Place.objects.all() ]
 
     ALLOWED = True
@@ -134,6 +151,14 @@ def rental_request(request, place_id):
 
 # ---- Staff --------------------------------------
 @login_required
+def place_registration(request):
+    if request.user.is_staff:
+        return render(request, "real_estate/place-registration.html")
+    else:
+        return render(request, "real_estate/access-denied.html")
+
+
+@login_required
 def place_house_registration(request):
     if request.user.is_staff:
         if request.method == 'POST':
@@ -216,8 +241,9 @@ def place_kitnet_registration(request):
 def staff_dashboard(request):
     if request.user.is_staff:
         # Aqui o membro de staff poderá 
-        # 1. Gerenciar imóveis: Mostrar imóveis locados
-        # 2. Aceitar ou rejeitar (rented.user_rental_interest) Esta parte é mesmo necessária?
+        # 1. Aceitar ou rejeitar requisição de aluguel
+        # 2. Gerenciar imóveis: Mostrar imóveis locados
+        # 3. Registrar imóveis
         return render(request, "real_estate/staff-dashboard.html")
     else:
         return render(request, "real_estate/access-denied.html")
@@ -229,10 +255,6 @@ def request_management(request):
         # Aqui o membro de staff poderá 
         # aceitar ou rejeitar (rented.user_rental_interest)
         
-        # Como deletar items?
-        # Como implementar botão para aceitar ou remover?
-        
-        # rented_pk_list = [ rented.place.pk if rented.status is False for rented in Rented.objects.all() ]
         rented_places = []
         for rented_place in Rented.objects.all():
             if rented_place.status is False:
@@ -247,8 +269,6 @@ def request_management(request):
 def accept(request, place_id):
     if request.user.is_staff:
         # Aceitar pedido
-        # for rented_place in Rented.objects.all():
-        #     if rented_place.place.pk = 
         rented = Rented.objects.get(pk=place_id)
         rented.status = True
         rented.save()

@@ -2,9 +2,14 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<!-- Staff pode ver todos os imóveis e sort por locado -->
-
 <main>
+    <div>
+        <a href="{% url 'main' %}">Todos</a>
+        <a href="{% url 'main-sorted' 'Casa' %}">Casa</a>
+        <a href="{% url 'main-sorted' 'Apartamento' %}">Apartamento</a>
+        <a href="{% url 'main-sorted' 'Kitnet' %}">Kitnet</a>
+    </div>
+    
     <h1>Imóveis disponíveis</h1>
     {% for place in places %}
         <div onclick="window.location.href='/{{place.pk}}/'">

@@ -2,13 +2,6 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<!-- Depois daqui criar a página de buscas, onde
-    aparecem todos os apês. Fazer tbm a sorting -->
-<!-- Faltam as páginas de listagem de imóveis disponíveis
-    1. Usuário somente vê os imóveis disponíveis. E tbm pode sort por tipo 
-    2. Staff pode ver todos os imóveis e sort por locado -->
-<!-- Publicar tudo no GitHub e PythonAnywhere e enviar via email -->
-
 <main>
     <h1>Selecione a atividade</h1>
     <div>
@@ -18,6 +11,10 @@
 
         <div onclick="window.location.href='/view-rented/'">
             <h2>Lista de imóveis locados</h1>
+        </div>
+
+        <div onclick="window.location.href='/place-registration/'">
+            <h2>Registrar imóveis</h1>
         </div>
     </div>
 </main>

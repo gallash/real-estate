@@ -1,0 +1,22 @@
+{% extends "real_estate/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<main>
+    <h1>Adicionar</h1>
+    <div>
+        <div onclick="window.location.href='/house-registration/'">
+            <h2>Casas</h1>
+        </div>
+
+        <div onclick="window.location.href='/appartment-registration/'">
+            <h2>Apartamentos</h1>
+        </div>
+
+        <div onclick="window.location.href='/kitnet-registration/'">
+            <h2>Kitnets</h1>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
