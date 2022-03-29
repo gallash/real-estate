@@ -1,8 +1,21 @@
 {% extends "real_estate/base.html" %}
+{% load crispy_forms_tags %}
 {% block content %}
 
+<!-- Staff pode ver todos os imóveis e sort por locado -->
+
 <main>
-    <h1>Hello World!</h1>
+    <h1>Imóveis disponíveis</h1>
+    {% for place in places %}
+        <div onclick="window.location.href='/{{place.pk}}/'">
+            <p>ID do imóvel: {{place.pk}}</p>
+            <p>Tipo do imóvel: {{place.type_of_place}}</p>
+            <p>Cidade, Estado: {{place.city}},{{rented.place.state}}</p>
+            <p>Preço do aluguel: R${{place.price}}</p>
+        </div>
+    {% endfor %}
+
+
 </main>
 
 {% endblock %}

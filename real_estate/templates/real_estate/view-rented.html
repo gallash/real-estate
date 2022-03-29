@@ -1,0 +1,23 @@
+{% extends "real_estate/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<!-- Staff pode ver todos os imóveis e sort por locado -->
+
+<main>
+    <h1>Imóveis locados</h1>
+    {% for rented in rented_places%}
+            <div onclick="window.location.href='/{{rented.place.pk}}/'">
+                <strong>Cliente: {{rented.user.username}}</strong>
+                <p>ID do imóvel: {{rented.place.pk}}</p>
+                <p>Tipo do imóvel: {{rented.place.type_of_place}}</p>
+                <p>Cidade, Estado: {{rented.place.city}},{{rented.place.state}}</p>
+                <p>Período: de {{rented.start_date}} a {{rented.end_date}}</p>
+                <p>Preço do aluguel: R${{rented.place.price}}</p>
+            </div>
+    {% endfor %}
+
+
+</main>
+
+{% endblock %}

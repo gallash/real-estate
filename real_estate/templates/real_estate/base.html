@@ -5,6 +5,16 @@
     </head>
 
     <body>
+        <header></header>
+        <div>
+            <!-- Mensagens -->
+            {% if messages %}
+                {% for message in messages %}
+                    <p>{{message}}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+
         {% block content %}
         {% endblock %}
     </body>

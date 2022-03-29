@@ -19,31 +19,54 @@ def main(request): # Cuida da paginação
     # print(request.session.values())
 
     # Mostrar todos os imóveis disponíveis
-       
-    return render(request, "real_estate/main.html")
+    # Sort por tipo
+    # Se der, fazer separar em páginas
+    rented_pk_list = [ rented.place.pk for rented in Rented.objects.all() ]
+    places = []
+    for place in Place.objects.all():
+        if place.pk not in rented_pk_list:
+            places.append(place)
+
+    context = {'places': places}
+    return render(request, "real_estate/main.html", context=context)
 
 
 def pagination(request, place_id):
-    # Procurar no banco de dados qual o imóvel procurado 
-    # pelo place_id (pk/id do imóvel)
-    
     rented_pk_list = [ rented.place.pk for rented in Rented.objects.all() ]
     available_pk_list = [ place.pk for place in Place.objects.all() ]
 
-    if (place_id not in rented_pk_list)and(place_id in available_pk_list): 
-        # Se place_id pertencer a algum imóvel disponível
-        # Não queremos mostrar publicamente onde pessoas moram
-
+    ALLOWED = True
+    for rented_place in Rented.objects.all():
+        if rented_place.place.pk == place_id:
+            rented = rented_place
+            if rented.status == True:
+                ALLOWED = False
+                break
+    
+    if (ALLOWED)and(place_id in available_pk_list):
         place = Place.objects.get(pk=place_id)
-
         context = {'place': place} # Informação do imóvel que o usuário clicou
         return render(request, "real_estate/pagination.html", context=context)
     elif (request.user.is_staff)and(place_id in available_pk_list):
         place = Place.objects.get(pk=place_id)
-        context = {'place': place} 
+        context = {'place': place} # Informação do imóvel que o usuário clicou
         return render(request, "real_estate/pagination.html", context=context)
     else:
         return render(request, "real_estate/access-denied.html")
+
+    # if (place_id not in rented_pk_list)and(place_id in available_pk_list): 
+    #     # Se place_id pertencer a algum imóvel disponível
+    #     # Não queremos mostrar publicamente onde pessoas moram
+    #     place = Place.objects.get(pk=place_id)
+
+    #     context = {'place': place} # Informação do imóvel que o usuário clicou
+    #     return render(request, "real_estate/pagination.html", context=context)
+    # elif (request.user.is_staff)and(place_id in available_pk_list):
+    #     place = Place.objects.get(pk=place_id)
+    #     context = {'place': place} 
+    #     return render(request, "real_estate/pagination.html", context=context)
+    # else:
+    #     return render(request, "real_estate/access-denied.html")
 
 
 # ---- Usuário ------------------------------------
@@ -52,10 +75,10 @@ def user_registration(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             # Realizar checkups 
-            # save
-            return redirect("login") # Change this in the settings.py file
+            form.save()
+            return redirect("login") 
+            # Change this in the settings.py file
             # 'login' is already a pre-built system
-            # pass
     else:
         form = UserRegistrationForm()
     context = {'form': form}
@@ -64,6 +87,10 @@ def user_registration(request):
 
 @login_required
 def user_dashboard(request):
+    # Alterar dados
+    # Excluir conta
+    # Verificar a solicitação de aluguel
+    # Cancelar solicitação de aluguel
     return render(request, "real_estate/user-dashboard.html")
 
 
@@ -89,8 +116,8 @@ def rental_request(request, place_id):
             user_comment = form.cleaned_data.get('user_comment')
             place = Place.objects.get(pk=place_id)
             rented = Rented(user=request.user, place=place, start_date=start_date, end_date=end_date, user_comment = user_comment)
-            # rented.save()
-            messages.success(request, "Requisição realizada com sucesso. A equipe irá avaliar o pedido.")
+            rented.save()
+            messages.success(request, "Solicitação realizada com sucesso. A equipe irá avaliar o pedido.")
         
             return redirect('../../user')
        
@@ -131,7 +158,7 @@ def place_house_registration(request):
                 place = Place.objects.last()
                 place.type_of_place = "Casa"
                 place.save()
-                messages.success("O imóvel foi cadastrado com sucesso")
+                messages.success(request, "O imóvel foi cadastrado com sucesso")
         else:
             form = HousePlaceForm()
 
@@ -153,7 +180,7 @@ def place_appartment_registration(request):
                 place = Place.objects.last()
                 place.type_of_place = "Apartamento"
                 place.save()
-                messages.success("O imóvel foi cadastrado com sucesso")
+                messages.success(request, "O imóvel foi cadastrado com sucesso")
         else:
             form = AppartmentPlaceForm()
 
@@ -175,7 +202,7 @@ def place_kitnet_registration(request):
                 place = Place.objects.last()
                 place.type_of_place = "Kitnet"
                 place.save()
-                messages.success("O imóvel foi cadastrado com sucesso")
+                messages.success(request, "O imóvel foi cadastrado com sucesso")
         else:
             form = KitnetPlaceForm()
 
@@ -191,8 +218,68 @@ def staff_dashboard(request):
         # Aqui o membro de staff poderá 
         # 1. Gerenciar imóveis: Mostrar imóveis locados
         # 2. Aceitar ou rejeitar (rented.user_rental_interest) Esta parte é mesmo necessária?
-        pass
+        return render(request, "real_estate/staff-dashboard.html")
+    else:
+        return render(request, "real_estate/access-denied.html")
 
+
+@login_required
+def request_management(request):
+    if request.user.is_staff:
+        # Aqui o membro de staff poderá 
+        # aceitar ou rejeitar (rented.user_rental_interest)
+        
+        # Como deletar items?
+        # Como implementar botão para aceitar ou remover?
+        
+        # rented_pk_list = [ rented.place.pk if rented.status is False for rented in Rented.objects.all() ]
+        rented_places = []
+        for rented_place in Rented.objects.all():
+            if rented_place.status is False:
+                rented_places.append(rented_place)
+
+        context = {'rented_places': rented_places}
+        return render(request, "real_estate/request-management.html", context=context)
+    else:
+        return render(request, "real_estate/access-denied.html")
+
+@login_required
+def accept(request, place_id):
+    if request.user.is_staff:
+        # Aceitar pedido
+        # for rented_place in Rented.objects.all():
+        #     if rented_place.place.pk = 
+        rented = Rented.objects.get(pk=place_id)
+        rented.status = True
+        rented.save()
+
+        return redirect("../../request-management") #request_management(request)
+    else:
+        return render(request, "real_estate/access-denied.html")
+
+@login_required
+def refuse(request, place_id):
+    if request.user.is_staff:
+        # Recusar e excluir pedido
+        rented = Rented.objects.get(pk=place_id)
+        rented.delete()
+
+        return redirect("../../request-management") # request_management(request)
+    else:
+        return render(request, "real_estate/access-denied.html")
+
+
+@login_required
+def view_rented(request):
+    if request.user.is_staff:
+        # Aqui o membro de staff poderá gerenciar imóveis: Mostrar imóveis locados
+        rented = []
+        for rented_place in Rented.objects.all():
+            if rented_place.status is True:
+                rented.append(rented_place)
+        
+        context = {'rented_places': rented}
+        return render(request, "real_estate/view-rented.html", context)
     else:
         return render(request, "real_estate/access-denied.html")
 

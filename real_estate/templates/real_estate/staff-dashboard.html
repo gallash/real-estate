@@ -10,19 +10,15 @@
 <!-- Publicar tudo no GitHub e PythonAnywhere e enviar via email -->
 
 <main>
-    <h1>Expressão de interesse</h1>
-    <form method="POST">
-        {% csrf_token %}
-        <fieldset>
-            {{ form|crispy }}
-        </fieldset>
-        <div>
-            <button type="submit">Submeter</button>
-        </div>
-    </form>
-
+    <h1>Selecione a atividade</h1>
     <div>
-        <strong>Após a submissão da expressão de interesse, um membro de staff entrará em contato pelo email ou telefone!</strong>
+        <div onclick="window.location.href='/request-management'">
+            <h2>Responder solicitações</h1>
+        </div>
+
+        <div onclick="window.location.href='/view-rented/'">
+            <h2>Lista de imóveis locados</h1>
+        </div>
     </div>
 </main>
 
