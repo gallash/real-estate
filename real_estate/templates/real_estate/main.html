@@ -3,22 +3,26 @@
 {% block content %}
 
 <main>
-    <div>
-        <a href="{% url 'main' %}">Todos</a>
-        <a href="{% url 'main-sorted' 'Casa' %}">Casa</a>
-        <a href="{% url 'main-sorted' 'Apartamento' %}">Apartamento</a>
-        <a href="{% url 'main-sorted' 'Kitnet' %}">Kitnet</a>
+    <div class="main-navbar">
+        <a class="navbar-anchors" href="{% url 'main' %}">Todos</a>
+        <a class="navbar-anchors" href="{% url 'main-sorted' 'Casa' %}">Casa</a>
+        <a class="navbar-anchors" href="{% url 'main-sorted' 'Apartamento' %}">Apartamento</a>
+        <a class="navbar-anchors" href="{% url 'main-sorted' 'Kitnet' %}">Kitnet</a>
     </div>
     
-    <h1>Imóveis disponíveis</h1>
-    {% for place in places %}
-        <div onclick="window.location.href='/{{place.pk}}/'">
+    <!-- Centralizar elementos, criar borda, cinza, rounded edges -->
+
+    <h1 class="main-h1">Imóveis disponíveis</h1>
+    <div class="div-all-items">
+        {% for place in places %}
+        <div class="div-items" onclick="window.location.href='/{{place.pk}}/'">
             <p>ID do imóvel: {{place.pk}}</p>
             <p>Tipo do imóvel: {{place.type_of_place}}</p>
             <p>Cidade, Estado: {{place.city}},{{rented.place.state}}</p>
             <p>Preço do aluguel: R${{place.price}}</p>
         </div>
     {% endfor %}
+    </div>
 
 
 </main>
